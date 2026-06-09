@@ -1,0 +1,22 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # 每周一凌晨2点同步
+  workflow_dispatch:      # 手动触发按钮
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync upstream
+        run: |
+          git remote add upstream https://github.com/qist/tvbox.git || true
+          git fetch upstream
+          git merge upstream/master --no-edit || echo "有冲突需手动解决"
+          git push origin master          
